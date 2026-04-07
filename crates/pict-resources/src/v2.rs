@@ -1,3 +1,8 @@
+//! PICT version 2 format opcodes and structures.
+//!
+//! PICT v2 is the extended QuickDraw picture format introduced with 32-bit
+//! QuickDraw, supporting color images, pixmaps, and more advanced operations.
+
 use binrw::{binread, BinRead, BinReaderExt, BinResult};
 #[cfg(feature = "serde")]
 use serde_big_array::BigArray;
@@ -6,6 +11,10 @@ use crate::PictVersion;
 
 use super::shared::*;
 
+/// PICT version 2 opcode enumeration.
+///
+/// Version 2 opcodes include all the operations from v1 plus support for
+/// color images, pixmaps, and additional QuickDraw features.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

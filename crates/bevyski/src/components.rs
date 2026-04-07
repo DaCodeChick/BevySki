@@ -1,4 +1,11 @@
-// ECS Components for BevySki
+//! ECS components for BevySki.
+//!
+//! Defines all the entity components used in the game, including:
+//! - Skier state and physics
+//! - Course position tracking
+//! - Obstacles and their types
+//! - Score and timer tracking
+//! - Visual elements like ski trails
 
 use bevy::prelude::*;
 
@@ -47,11 +54,16 @@ impl Default for CoursePosition {
     }
 }
 
-/// Ski trail marks left by the skier
+/// Ski trail marks left by the skier.
+///
+/// Represents a visual trail segment showing where the skier has been.
 #[derive(Component)]
 pub struct SkiTrail {
+    /// Starting position of the trail segment.
     pub start_pos: Vec2,
+    /// Ending position of the trail segment.
     pub end_pos: Vec2,
+    /// Angle of the skier when this trail was made.
     pub angle: i16,
 }
 
@@ -70,6 +82,10 @@ pub enum ObstacleType {
     Other(u8),
 }
 
+/// Converts an image/sprite ID into an obstacle type.
+///
+/// Maps ranges of image IDs to specific obstacle types based on
+/// the original MacSki asset organization.
 impl From<u8> for ObstacleType {
     fn from(image_id: u8) -> Self {
         match image_id {
@@ -82,43 +98,62 @@ impl From<u8> for ObstacleType {
     }
 }
 
-/// Obstacle on the ski course
+/// Obstacle on the ski course.
+///
+/// Represents a physical object on the course that the skier can interact with.
 #[derive(Component)]
 pub struct Obstacle {
+    /// Type classification of this obstacle.
     pub obstacle_type: ObstacleType,
-    /// Image/sprite ID
+    /// Image/sprite ID from original game assets.
     pub image_id: u8,
-    /// Course distance where obstacle is located
+    /// Course distance where obstacle is located.
     pub course_distance: f32,
-    /// Horizontal position
+    /// Horizontal position on the course.
     pub course_x: f32,
-    /// Collision bounds
+    /// Collision bounds (width, height).
     pub bounds: Vec2,
 }
 
-/// Player score and statistics
+/// Player score and statistics.
+///
+/// Tracks various gameplay metrics for the current run.
 #[derive(Component, Default)]
 pub struct Score {
+    /// Total distance traveled down the course.
     pub distance: f32,
+    /// Elapsed time in seconds.
     pub time: f32,
+    /// Number of flags collected during this run.
     pub flags_collected: u32,
+    /// Number of jumps performed.
     pub jumps_performed: u32,
+    /// Number of times the skier has crashed.
     pub crashes: u32,
 }
 
-/// Game timer
+/// Game timer component.
+///
+/// Tracks elapsed time for the current game session or run.
 #[derive(Component)]
 pub struct GameTimer {
+    /// Time elapsed in seconds.
     pub elapsed: f32,
 }
 
-/// Wind/weather effects
+/// Wind/weather effects component.
+///
+/// Represents environmental forces that affect skier movement.
 #[derive(Component)]
 pub struct Wind {
+    /// Horizontal wind force (positive = push right, negative = push left).
     pub horizontal_force: f32,
+    /// Vertical wind force affecting downhill speed.
     pub vertical_force: f32,
 }
 
-/// Camera that follows the skier
+/// Camera that follows the skier.
+///
+/// Marker component for the camera entity that tracks the player.
 #[derive(Component)]
 pub struct SkiCamera;

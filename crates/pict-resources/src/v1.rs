@@ -1,9 +1,18 @@
+//! PICT version 1 format opcodes and structures.
+//!
+//! PICT v1 is the original QuickDraw picture format used in early versions
+//! of Mac OS. This module defines the opcodes and parsing logic for v1 files.
+
 use binrw::prelude::*;
 
 use crate::PictVersion;
 
 use super::shared::*;
 
+/// PICT version 1 opcode enumeration.
+///
+/// Each variant represents a QuickDraw drawing command from the original
+/// Macintosh imaging model.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

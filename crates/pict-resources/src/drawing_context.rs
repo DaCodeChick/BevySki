@@ -1,3 +1,8 @@
+//! Drawing context for rendering PICT operations to an image buffer.
+//!
+//! This module provides the core rendering engine that interprets PICT opcodes
+//! and draws them onto an RGBA image buffer.
+
 use std::collections::HashSet;
 
 use image::Rgba;
@@ -7,13 +12,25 @@ use crate::{
     v1, v2,
 };
 
+/// Main drawing context that maintains the canvas and rendering state.
+///
+/// Processes PICT v1 and v2 opcodes, managing clipping regions, color tables,
+/// and various QuickDraw operations.
 pub struct DrawingContext {
+    /// The RGBA image buffer being drawn to.
     canvas: image::ImageBuffer<image::Rgba<u8>, Vec<u8>>,
+    /// Bounding rectangle of the drawing area.
     bounds: Rect,
+    /// Current clipping region.
     clipping_region: Region,
 }
 
 impl DrawingContext {
+    /// Creates a new drawing context with the specified bounds.
+    ///
+    /// # Arguments
+    ///
+    /// * `bounds` - The bounding rectangle for the canvas
     pub fn new(bounds: Rect) -> Self {
         if bounds.width() < 0 {
             log::warn!("Bounds has negative width");
@@ -31,6 +48,11 @@ impl DrawingContext {
         }
     }
 
+    /// Processes a PICT v1 opcode.
+    ///
+    /// # Returns
+    ///
+    /// `true` if this is an end-of-picture opcode, `false` otherwise.
     pub fn command_v1(&mut self, cmd: v1::Opcode) -> bool {
         match cmd {
             v1::Opcode::NOP => log::info!("v1::Opcode::NOP"),
@@ -321,6 +343,11 @@ impl DrawingContext {
         false
     }
 
+    /// Processes a PICT v2 opcode.
+    ///
+    /// # Returns
+    ///
+    /// `true` if this is an end-of-picture opcode, `false` otherwise.
     pub fn command_v2(&mut self, cmd: v2::Opcode) -> bool {
         match cmd {
             v2::Opcode::NOP => log::info!("v2::Opcode::NOP"),
@@ -876,6 +903,7 @@ impl DrawingContext {
         &self.canvas
     }
 
+    /// Consumes the drawing context and returns the final RGBA image buffer.
     pub fn into_image(self) -> image::ImageBuffer<image::Rgba<u8>, Vec<u8>> {
         self.canvas
     }

@@ -1,10 +1,19 @@
+//! Shared data structures and utilities for PICT decoding.
+//!
+//! This module contains common types used by both PICT v1 and v2 formats,
+//! including geometric primitives, color tables, pixel maps, and transfer modes.
+
 use binrw::{binread, io, BinRead, BinReaderExt, BinResult, Error};
 use enum_is::EnumIs;
 use std::io::Read;
 
 use crate::PictVersion;
 
+/// Extension trait for PackBits compression decoding.
 trait PackBitsReaderExt: io::Read {
+    /// Reads PackBits-compressed data into the output buffer.
+    ///
+    /// PackBits is a simple run-length encoding scheme used in PICT files.
     fn read_packbits(&mut self, out: &mut [u8]) -> io::Result<()> {
         let mut written = 0usize;
         while written < out.len() {

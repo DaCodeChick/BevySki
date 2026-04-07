@@ -1,20 +1,30 @@
 //! Ski Lodge (hub/menu) UI and transitions.
+//!
+//! The Ski Lodge serves as the main hub/menu screen in BevySki, matching
+//! the original MacSki's flow. From here, players can start a new run,
+//! adjust settings, or quit the game.
 
 use bevy::prelude::*;
 
 use crate::states::GameState;
 use crate::systems::settings_ui::SettingsDialogState;
 
+/// Marker component for the Ski Lodge UI root node.
 #[derive(Component)]
 pub(crate) struct SkiLodgeRoot;
 
+/// Actions available in the Ski Lodge menu.
 #[derive(Component)]
 pub(crate) enum SkiLodgeAction {
+    /// Start a new ski run (enters Playing state).
     StartRun,
+    /// Open settings dialog.
     Settings,
+    /// Quit the application.
     Quit,
 }
 
+/// Marker component for Ski Lodge button labels.
 #[derive(Component)]
 pub(crate) struct SkiLodgeButtonLabel;
 
@@ -68,6 +78,13 @@ pub fn spawn_ski_lodge_ui(mut commands: Commands) {
         });
 }
 
+/// Helper function to spawn a Ski Lodge menu button.
+///
+/// # Arguments
+///
+/// * `parent` - Parent UI node builder
+/// * `label` - Text to display on the button
+/// * `action` - Action to perform when button is clicked
 fn spawn_button(parent: &mut ChildSpawnerCommands, label: &str, action: SkiLodgeAction) {
     parent
         .spawn((

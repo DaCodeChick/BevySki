@@ -45,14 +45,14 @@ impl Default for Course {
 impl Course {
     /// Generate a random course
     pub fn random() -> Self {
-        use rand::Rng;
-        let mut rng = rand::thread_rng();
+        use rand::RngExt;
+        let mut rng = rand::rng();
 
         let mut course = Self {
-            name: format!("Random Course {}", rng.gen_range(1..1000)),
-            slope_difficulty: rng.gen_range(0..4),
-            skill_level: rng.gen_range(0..3),
-            length: rng.gen_range(50000.0..200000.0),
+            name: format!("Random Course {}", rng.random_range(1..1000)),
+            slope_difficulty: rng.random_range(0..4),
+            skill_level: rng.random_range(0..3),
+            length: rng.random_range(50000.0..200000.0),
             obstacles: Vec::new(),
         };
 
@@ -60,12 +60,12 @@ impl Course {
         let mut current_distance = 500.0;
         while current_distance < course.length {
             let obstacle = CourseObstacle {
-                image_id: rng.gen_range(0..20), // Different obstacle types
+                image_id: rng.random_range(0..20), // Different obstacle types
                 distance: current_distance,
-                x: rng.gen_range(50.0..900.0),
+                x: rng.random_range(50.0..900.0),
             };
             course.obstacles.push(obstacle);
-            current_distance += rng.gen_range(200.0..800.0);
+            current_distance += rng.random_range(200.0..800.0);
         }
 
         course

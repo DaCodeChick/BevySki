@@ -1,4 +1,8 @@
 //! UI systems for in-game settings dialog.
+//!
+//! Provides an F1-toggled settings overlay that allows players to control
+//! game options like sound, animation, and ski trails. The dialog displays
+//! toggle buttons that update the global `GameSettings` resource.
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -6,21 +10,32 @@ use bevy::window::WindowResized;
 
 use crate::resources::{GameSettingFlags, GameSettings};
 
+/// Marker component for the root settings dialog node.
 #[derive(Component)]
 pub(crate) struct SettingsDialogRoot;
 
+/// Resource tracking whether the settings dialog is currently visible.
 #[derive(Resource, Default)]
 pub(crate) struct SettingsDialogState {
+    /// `true` if the dialog is currently shown, `false` if hidden.
     pub(crate) visible: bool,
 }
 
+/// Component for a settings toggle button.
+///
+/// Associates a button with a specific settings flag.
 #[derive(Component)]
 pub(crate) struct SettingsToggleButton {
+    /// The settings flag this button toggles.
     flag: GameSettingFlags,
 }
 
+/// Component for a settings toggle label.
+///
+/// Associates a text label with a specific settings flag for display sync.
 #[derive(Component)]
 pub(crate) struct SettingsToggleLabel {
+    /// The settings flag this label represents.
     flag: GameSettingFlags,
 }
 
@@ -79,6 +94,15 @@ pub fn initialize_window_metrics(
     }
 }
 
+/// Helper function to spawn a settings toggle row.
+///
+/// Creates a row containing a label and toggle button for a specific setting.
+///
+/// # Arguments
+///
+/// * `parent` - Parent UI node builder
+/// * `flag` - Settings flag this row controls
+/// * `title` - Display text for the setting
 fn spawn_toggle_row(parent: &mut ChildSpawnerCommands, flag: GameSettingFlags, title: &str) {
     parent
         .spawn((Node {
