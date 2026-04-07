@@ -5,6 +5,7 @@ pub mod course;
 pub mod movement;
 pub mod rendering;
 pub mod settings_ui;
+pub mod ski_lodge;
 
 use crate::states::GameState;
 use bevy::prelude::*;
@@ -45,6 +46,17 @@ impl Plugin for GameSystemsPlugin {
                 settings_ui::sync_settings_dialog,
                 settings_ui::update_window_metrics_from_resize,
             ),
+        );
+
+        app.add_systems(OnEnter(GameState::SkiLodge), ski_lodge::spawn_ski_lodge_ui);
+        app.add_systems(
+            Update,
+            ski_lodge::handle_ski_lodge_actions.run_if(in_state(GameState::SkiLodge)),
+        );
+        app.add_systems(OnExit(GameState::SkiLodge), ski_lodge::cleanup_ski_lodge_ui);
+        app.add_systems(
+            Update,
+            ski_lodge::return_to_ski_lodge_shortcut.run_if(in_state(GameState::Playing)),
         );
     }
 }

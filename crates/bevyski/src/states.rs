@@ -5,8 +5,10 @@ use bevy::prelude::*;
 /// Represents the current state of the game.
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum GameState {
-    /// Main menu screen.
+    /// Ski lodge (hub/menu) screen.
     #[default]
+    SkiLodge,
+    /// Main menu screen.
     MainMenu,
     /// Course selection screen.
     CourseSelect,

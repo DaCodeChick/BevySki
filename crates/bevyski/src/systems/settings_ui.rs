@@ -11,7 +11,7 @@ pub(crate) struct SettingsDialogRoot;
 
 #[derive(Resource, Default)]
 pub(crate) struct SettingsDialogState {
-    visible: bool,
+    pub(crate) visible: bool,
 }
 
 #[derive(Component)]

@@ -52,8 +52,8 @@ fn setup(mut commands: Commands, mut next_state: ResMut<NextState<GameState>>) {
     info!("BevySki started - Modern rewrite of MacSki v1.7");
     info!("Original game by David Rowbotham");
 
-    // Start in playing state for now (TODO: add main menu)
-    next_state.set(GameState::Playing);
+    // Start in Ski Lodge (hub/menu) to match original flow.
+    next_state.set(GameState::SkiLodge);
 }
 
 fn ensure_extracted_assets() {
