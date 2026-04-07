@@ -1,0 +1,38 @@
+{
+  "name": "Beginner's Hill",
+  "slope_difficulty": 1,
+  "skill_level": 0,
+  "length": 50000.0,
+  "obstacles": [
+    {
+      "image_id": 0,
+      "distance": 500.0,
+      "x": 400.0
+    },
+    {
+      "image_id": 1,
+      "distance": 1000.0,
+      "x": 550.0
+    },
+    {
+      "image_id": 11,
+      "distance": 1500.0,
+      "x": 475.0
+    },
+    {
+      "image_id": 14,
+      "distance": 2000.0,
+      "x": 300.0
+    },
+    {
+      "image_id": 2,
+      "distance": 2500.0,
+      "x": 700.0
+    },
+    {
+      "image_id": 6,
+      "distance": 3000.0,
+      "x": 350.0
+    }
+  ]
+}
