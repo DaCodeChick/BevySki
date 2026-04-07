@@ -139,13 +139,3 @@ pub fn cleanup_ski_lodge_ui(mut commands: Commands, roots: Query<Entity, With<Sk
         commands.entity(entity).despawn();
     }
 }
-
-/// Lets player return to Ski Lodge from gameplay with Escape.
-pub fn return_to_ski_lodge_shortcut(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut next_state: ResMut<NextState<GameState>>,
-) {
-    if keyboard.just_pressed(KeyCode::Escape) {
-        next_state.set(GameState::SkiLodge);
-    }
-}

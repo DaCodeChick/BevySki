@@ -1,6 +1,6 @@
 //! Collision detection system.
 
-use crate::components::{CoursePosition, Obstacle, ObstacleType, Skier};
+use crate::components::{CoursePosition, Obstacle, ObstacleType, Score, Skier};
 use bevy::prelude::*;
 
 /// Maximum vertical distance to check for collisions.
@@ -35,10 +35,10 @@ fn is_collision(skier_pos: &CoursePosition, obstacle: &Obstacle) -> bool {
 
 /// Checks for collisions between skier and obstacles.
 pub fn check_collisions(
-    mut skier_query: Query<(&mut Skier, &CoursePosition)>,
+    mut skier_query: Query<(&mut Skier, &CoursePosition, &mut Score)>,
     obstacle_query: Query<&Obstacle>,
 ) {
-    for (mut skier, skier_pos) in skier_query.iter_mut() {
+    for (mut skier, skier_pos, mut score) in skier_query.iter_mut() {
         if skier.is_crashed {
             continue;
         }
@@ -51,14 +51,24 @@ pub fn check_collisions(
             }
 
             if is_collision(skier_pos, obstacle) {
-                handle_collision(&mut skier, obstacle.obstacle_type, skier_pos.distance);
+                handle_collision(
+                    &mut skier,
+                    &mut score,
+                    obstacle.obstacle_type,
+                    skier_pos.distance,
+                );
             }
         }
     }
 }
 
 /// Handles what happens when skier hits an obstacle.
-fn handle_collision(skier: &mut Skier, obstacle_type: ObstacleType, _distance: f32) {
+fn handle_collision(
+    skier: &mut Skier,
+    score: &mut Score,
+    obstacle_type: ObstacleType,
+    _distance: f32,
+) {
     match obstacle_type {
         ObstacleType::Tree | ObstacleType::Rock => {
             skier.is_crashed = true;
@@ -69,11 +79,12 @@ fn handle_collision(skier: &mut Skier, obstacle_type: ObstacleType, _distance: f
         }
         ObstacleType::Jump => {
             skier.is_jumping = true;
+            score.jumps_performed = score.jumps_performed.saturating_add(1);
             // TODO: Play jump sound
             info!("Skier hit a jump!");
         }
         ObstacleType::Flag => {
-            // TODO: Increment score
+            score.flags_collected = score.flags_collected.saturating_add(1);
             // TODO: Play collection sound
             info!("Flag collected!");
         }

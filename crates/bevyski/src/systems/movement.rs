@@ -89,6 +89,7 @@ pub fn adjust_skier(time: Res<Time>, mut query: Query<(&mut Skier, &mut CoursePo
             // Jumps reduce speed temporarily
             skier.speed *= 0.9;
             // TODO: Full jump animation sequence
+            skier.is_jumping = false;
         }
 
         // Calculate acceleration based on angle
@@ -126,13 +127,9 @@ fn update_skiing_animation(skier: &mut Skier, delta: f32) {
     let anim_speed = (skier.speed / 100.0).min(10.0);
 
     // Cycle through animation frames (0-5 for different skiing poses)
-    static mut ANIM_TIMER: f32 = 0.0;
-    unsafe {
-        ANIM_TIMER += delta * anim_speed;
-        if ANIM_TIMER > ANIMATION_SPEED {
-            ANIM_TIMER = 0.0;
-            skier.animation_frame = (skier.animation_frame + 1) % 6;
-        }
+    let frame_advance = delta * anim_speed;
+    if frame_advance > ANIMATION_SPEED {
+        skier.animation_frame = (skier.animation_frame + 1) % 6;
     }
 }
 

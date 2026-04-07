@@ -20,7 +20,7 @@ use fourcc::fourcc;
 use hound::{SampleFormat, WavSpec, WavWriter};
 use pict_resources::extract_pict_resources_to_png;
 use resource_fork::ResourceFork;
-use resources::{Course, GameSettings};
+use resources::{Course, GameSettings, LastRunSummary, RunLifecycle, RunOutcome};
 use rfd::FileDialog;
 use snd::Sound as MacSound;
 use states::GameState;
@@ -46,6 +46,8 @@ fn main() {
         .add_plugins(GameSystemsPlugin)
         .init_state::<GameState>()
         .init_resource::<GameSettings>()
+        .init_resource::<RunLifecycle>()
+        .init_resource::<LastRunSummary>()
         .add_systems(Startup, setup)
         .add_systems(
             OnEnter(GameState::Playing),
@@ -274,7 +276,11 @@ fn extract_sound_resources_to_wav(
 ///
 /// Creates a random course, spawns the skier entity with initial components,
 /// and starts the game timer. Runs when entering the `Playing` state.
-fn start_game(mut commands: Commands) {
+fn start_game(
+    mut commands: Commands,
+    mut lifecycle: ResMut<RunLifecycle>,
+    mut summary: ResMut<LastRunSummary>,
+) {
     info!("Starting new game...");
 
     // Generate a random course (or load default)
@@ -300,6 +306,17 @@ fn start_game(mut commands: Commands) {
 
     // Insert course resource (obstacles will be spawned by course system)
     commands.insert_resource(course);
+
+    lifecycle.elapsed_seconds = 0.0;
+    lifecycle.crashed_seconds = 0.0;
+    lifecycle.crashes_since_dog = 0;
+    lifecycle.dog_rescue_active = false;
+    summary.outcome = RunOutcome::InProgress;
+    summary.distance = 0.0;
+    summary.time = 0.0;
+    summary.crashes = 0;
+    summary.flags_collected = 0;
+    summary.jumps_performed = 0;
 
     // Start game timer
     commands.spawn(GameTimer { elapsed: 0.0 });

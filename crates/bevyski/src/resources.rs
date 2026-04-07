@@ -138,3 +138,58 @@ impl Default for GameSettings {
         }
     }
 }
+
+/// Final outcome for a single ski run.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunOutcome {
+    /// Run is still in progress or no run has completed yet.
+    #[default]
+    InProgress,
+    /// Player reached the course end.
+    Finished,
+    /// Player exited the run manually.
+    Aborted,
+}
+
+/// Tracks runtime lifecycle data for the currently active run.
+#[derive(Resource, Debug, Default)]
+pub struct RunLifecycle {
+    /// Elapsed time for the active run in seconds.
+    pub elapsed_seconds: f32,
+    /// Elapsed time spent in crashed state in seconds.
+    pub crashed_seconds: f32,
+    /// Number of crashes since the last dog rescue sequence ended.
+    pub crashes_since_dog: u32,
+    /// True while the dog rescue sequence is active.
+    pub dog_rescue_active: bool,
+}
+
+/// Summary of the most recently completed run.
+#[derive(Resource, Debug)]
+pub struct LastRunSummary {
+    /// Last run outcome.
+    pub outcome: RunOutcome,
+    /// Distance reached on the run.
+    pub distance: f32,
+    /// Elapsed run time in seconds.
+    pub time: f32,
+    /// Total crashes recorded.
+    pub crashes: u32,
+    /// Total flags collected.
+    pub flags_collected: u32,
+    /// Total jumps performed.
+    pub jumps_performed: u32,
+}
+
+impl Default for LastRunSummary {
+    fn default() -> Self {
+        Self {
+            outcome: RunOutcome::InProgress,
+            distance: 0.0,
+            time: 0.0,
+            crashes: 0,
+            flags_collected: 0,
+            jumps_performed: 0,
+        }
+    }
+}
