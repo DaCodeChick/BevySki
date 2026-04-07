@@ -135,11 +135,10 @@ Sophisticated rectangle-based collision system:
    - Handles both point and area collisions
 
 3. **Response** (`DoObjectCollision`):
-   - Different behavior per obstacle type
-   - Trees/rocks → crash
-   - Jumps → launch skier
-   - Flags → collect/score
-   - Yeti → special crash
+    - Different behavior per obstacle type
+    - Trees/rocks → crash
+    - Jumps → launch skier
+    - Flags → collect/score
 
 ## Course System
 
@@ -190,7 +189,6 @@ MacSki used QuickDraw, Apple's 2D graphics API:
 - `MacSkiPlaySoundResource()` @ 0x10016438 - Play sound effect
 - Sound resources:
   - 0x450-0x458: Various skiing/crash sounds
-  - 0x3F8: Yeti sound
   - 0x3FB-0x3FD: Voice samples
   - 0x44C-0x44F: Jump sounds
 
@@ -213,13 +211,20 @@ MacSki used QuickDraw, Apple's 2D graphics API:
 
 ## Interesting Discoveries
 
-1. **Yeti Enemy**: Special obstacle type (image_id 17) that triggers unique crash
-2. **Ski Trails**: Dynamically rendered path behind skier with gap detection
-3. **Wind System**: `WindChill()` function affects skier movement
-4. **Game Modes**: Multiple play modes beyond basic skiing
-5. **Serial/Multiplayer**: Evidence of serial port communication code
-6. **Registration System**: Shareware check (removed for BevySki)
-7. **"Brew's Ski Lodge"**: Menu/lobby system (`IsBrewsSkiLodgeActive`, `GoToBrewsSkiLodge`)
+1. **Ski Trails**: Dynamically rendered path behind skier with gap detection
+2. **Wind System**: `WindChill()` function affects skier movement
+3. **Game Modes**: Multiple play modes beyond basic skiing
+4. **Serial/Multiplayer**: Evidence of serial port communication code
+5. **Registration System**: Shareware check (removed for BevySki)
+6. **"Brew's Ski Lodge"**: Menu/lobby system (`IsBrewsSkiLodgeActive`, `GoToBrewsSkiLodge`)
+
+## Original Assets
+
+The original MacSki v1.7 resource files are available in `/home/admin/Downloads/MacSki/`:
+- `MacSki Color Art.rsrc` - Sprite graphics (298KB)
+- `MacSki Sounds.rsrc` - Sound effects (233KB)
+- `MacSki v1.7.rsrc` - Main game resources (419KB)
+- `MacSki Courses/` - 44 original course files with .rsrc metadata
 
 ## Function Name Patterns
 

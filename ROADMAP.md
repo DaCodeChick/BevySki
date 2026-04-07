@@ -44,7 +44,6 @@ This document outlines the development plan for BevySki, organized by priority a
   - Rocks (crash)
   - Jumps (launch)
   - Flags (collect)
-  - Yeti (special crash)
 - [ ] Trick system during jumps
 - [ ] Wind/weather effects
 
@@ -117,7 +116,7 @@ This document outlines the development plan for BevySki, organized by priority a
 
 ### Reference
 - `MacSkiPlaySoundResource()` @ 0x10016438
-- Sound IDs: 0x450-0x458 (skiing), 0x3F8 (yeti), etc.
+- Sound IDs: 0x450-0x458 (skiing), 0x44C-0x44F (jumps), etc.
 
 ## Phase 7: Polish
 

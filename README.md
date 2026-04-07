@@ -54,7 +54,7 @@ This project was created by analyzing the MacSki v1.7 PEF (Preferred Executable 
 - ⬜ Score tracking and leaderboards
 - ⬜ Multiple game modes
 - ⬜ Course file loading/saving (JSON format)
-- ⬜ Classic MacSki obstacle types (trees, rocks, jumps, flags, Yeti!)
+- ⬜ Classic MacSki obstacle types (trees, rocks, jumps, flags)
 - ⬜ Weather effects (wind/snow)
 
 ## Building and Running
@@ -97,24 +97,65 @@ Based on the original obstacle types:
 - **Rocks**: Instant crash  
 - **Jumps**: Launch the skier into the air
 - **Flags**: Collect for points
-- **Yeti**: The classic MacSki enemy - instant game over!
 
 ## Development
 
-### Project Structure
+### Workspace Structure
+
+This project uses a Cargo workspace with multiple crates:
+
 ```
-src/
-├── main.rs           # Entry point and game setup
-├── components.rs     # ECS components (Skier, Obstacle, etc.)
-├── systems/
-│   ├── movement.rs   # Physics and input
-│   ├── collision.rs  # Collision detection
-│   ├── rendering.rs  # Graphics
-│   └── course.rs     # Course generation/loading
-├── resources.rs      # Global resources (Course, Settings)
-├── constants.rs      # Game constants from original
-└── states.rs         # Game state machine
+BevySki/
+├── Cargo.toml              # Workspace root
+├── crates/
+│   ├── bevyski/           # Main game executable
+│   │   ├── src/
+│   │   │   ├── main.rs           # Entry point and game setup
+│   │   │   ├── components.rs     # ECS components (Skier, Obstacle, etc.)
+│   │   │   ├── systems/
+│   │   │   │   ├── movement.rs   # Physics and input
+│   │   │   │   ├── collision.rs  # Collision detection
+│   │   │   │   ├── rendering.rs  # Graphics
+│   │   │   │   └── course.rs     # Course generation/loading
+│   │   │   ├── resources.rs      # Global resources (Course, Settings)
+│   │   │   ├── constants.rs      # Game constants from original
+│   │   │   └── states.rs         # Game state machine
+│   │   └── Cargo.toml
+│   └── resfork/           # Resource fork parser library
+│       ├── src/
+│       │   ├── lib.rs            # Core parser
+│       │   └── types.rs          # MacSki resource types
+│       ├── examples/
+│       │   └── list_resources.rs # Example usage
+│       ├── README.md
+│       └── Cargo.toml
+├── courses/               # Course data files
+├── README.md
+├── REVERSE_ENGINEERING.md
+└── ROADMAP.md
 ```
+
+### Building
+
+```bash
+# Build entire workspace
+cargo build
+
+# Build release version
+cargo build --release
+
+# Run the game
+cargo run -p bevyski
+
+# Run resource fork examples
+cargo run -p resfork --example list_resources
+```
+
+### Technology Stack
+
+- **Rust Edition**: 2024
+- **Game Engine**: Bevy 0.18
+- **Resource Parser**: Custom resfork crate for classic Mac resource files
 
 ### Contributing
 Contributions are welcome! This project aims to be a faithful recreation while modernizing for cross-platform play.

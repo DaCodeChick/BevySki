@@ -1,0 +1,14 @@
+[package]
+name = "bevyski"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+description = "Modern cross-platform rewrite of the classic MacSki game using Bevy"
+license.workspace = true
+
+[dependencies]
+bevy.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+resfork.workspace = true
