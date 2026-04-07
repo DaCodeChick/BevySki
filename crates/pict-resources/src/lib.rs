@@ -1,7 +1,6 @@
 //! Classic Macintosh PICT resource decoding and PNG conversion.
 
 use binrw::{BinRead, BinReaderExt};
-use enum_is::EnumIs;
 use fourcc::fourcc;
 use resource_fork::ResourceFork;
 use std::io::{Cursor, Seek};
@@ -18,23 +17,38 @@ pub use drawing_context::DrawingContext;
 /// Errors returned when converting PICT resources.
 #[derive(Debug, Error)]
 pub enum PictResourceError {
+    /// Error from reading classic Macintosh resource forks.
     #[error(transparent)]
     ResourceFork(#[from] resource_fork::Error),
+    /// Error while parsing binary PICT structures.
     #[error(transparent)]
     BinRead(#[from] binrw::Error),
+    /// I/O error while reading or writing image data.
     #[error(transparent)]
     Io(#[from] std::io::Error),
+    /// Error reported by the `image` crate while encoding PNG output.
     #[error(transparent)]
     Image(#[from] image::ImageError),
 }
 
-#[derive(BinRead, Debug, EnumIs)]
+/// PICT file major version marker found in the picture stream.
+#[allow(missing_docs)]
+#[derive(BinRead, Debug)]
 #[br(big)]
 pub enum PictVersion {
+    /// Original PICT v1 marker.
     #[br(magic(0x11u8))]
     Version1(u8),
+    /// Extended PICT v2 marker.
     #[br(magic(0x0011u16))]
     Version2,
+}
+
+impl PictVersion {
+    /// Returns `true` when this marker is PICT v2.
+    pub const fn is_version2(&self) -> bool {
+        matches!(self, Self::Version2)
+    }
 }
 
 #[derive(BinRead, Debug)]

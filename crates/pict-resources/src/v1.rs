@@ -307,5 +307,6 @@ pub enum Opcode {
     #[br(magic = 0xFFu8)]
     EndOfPicture,
 
+    /// Unrecognized opcode value.
     Unknown(u8),
 }

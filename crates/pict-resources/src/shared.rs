@@ -4,7 +4,6 @@
 //! including geometric primitives, color tables, pixel maps, and transfer modes.
 
 use binrw::{binread, io, BinRead, BinReaderExt, BinResult, Error};
-use enum_is::EnumIs;
 use std::io::Read;
 
 use crate::PictVersion;
@@ -119,11 +118,14 @@ fn unpack_words_exact(input: &[u8], expected_len: usize) -> io::Result<Vec<u8>> 
     Ok(out)
 }
 
-// Proper size
+/// Signed 16-bit QuickDraw scalar.
 pub type Short = i16;
+/// Unsigned 32-bit QuickDraw scalar.
 pub type Long = u32; // 4 bytes
 
-#[derive(Debug, Clone, BinRead, EnumIs)]
+/// QuickDraw transfer mode used when compositing source and destination pixels.
+#[allow(missing_docs)]
+#[derive(Debug, Clone, BinRead)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Default)]
 pub enum TransferMode {
@@ -178,6 +180,7 @@ pub enum TransferMode {
     Unknown(u16),
 }
 
+/// Packed pixmap bytes decoded from PICT copy-bits payloads.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PixMapData {
@@ -286,7 +289,7 @@ impl BinRead for PixMapData {
                         let scanline_start = y * unpacked_scanline_size;
 
                         for x in 0..width {
-                            let a = 0xFF - lookup[scanline_start + 0 * width + x];
+                            let a = 0xFF - lookup[scanline_start + x];
                             let r = lookup[scanline_start + width + x];
                             let g = lookup[scanline_start + 2 * width + x];
                             let b = lookup[scanline_start + 3 * width + x];
@@ -498,14 +501,18 @@ fn decode_rle_scanline(
     }
 }
 
+/// 16.16 fixed-point number used by QuickDraw.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Fixed {
+    /// Signed integer part.
     pub int: i16,
+    /// Fractional part.
     pub fraction: i16,
 }
 
+/// Compression mode for pixmap scanline data.
 #[derive(BinRead, Debug, Clone, PartialEq, Eq)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -526,20 +533,27 @@ pub enum PackType {
     /// Run length encoding one component at a time, one scan line at a time, red component first - supported only for 32-bit pixels (24-bit data)
     RunLengthEncodedComponents,
 
+    /// Unrecognized pack type value.
     Other(u16),
 }
 
+/// QuickDraw rectangle, using top/left/bottom/right coordinates.
 #[derive(BinRead, Debug, Copy, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rect {
+    /// Top Y coordinate.
     pub top: Short,
+    /// Left X coordinate.
     pub left: Short,
+    /// Bottom Y coordinate.
     pub bottom: Short,
+    /// Right X coordinate.
     pub right: Short,
 }
 
 impl Rect {
+    /// Creates a rectangle with origin at `(0, 0)` and the given size.
     pub fn new_with_size(width: Short, height: Short) -> Self {
         Self {
             top: 0,
@@ -549,14 +563,17 @@ impl Rect {
         }
     }
 
+    /// Returns rectangle height.
     pub fn height(&self) -> Short {
         self.bottom - self.top
     }
 
+    /// Returns rectangle width.
     pub fn width(&self) -> Short {
         self.right - self.left
     }
 
+    /// Returns the top-left point.
     pub fn origin(&self) -> Point {
         Point {
             x: self.left,
@@ -564,6 +581,7 @@ impl Rect {
         }
     }
 
+    /// Returns `true` when `other` is fully contained by this rectangle.
     pub fn contains(&self, other: &Rect) -> bool {
         self.min_x() <= other.min_x()
             && self.min_y() <= other.min_y()
@@ -571,6 +589,7 @@ impl Rect {
             && self.max_y() >= other.max_y()
     }
 
+    /// Returns `true` when the given point lies inside this rectangle.
     pub fn includes(&self, x: i32, y: i32) -> bool {
         self.min_x() as i32 <= x
             && self.max_x() as i32 > x
@@ -578,28 +597,35 @@ impl Rect {
             && self.max_y() as i32 > y
     }
 
+    /// Minimum X coordinate.
     pub fn min_x(&self) -> Short {
         self.left
     }
 
+    /// Maximum X coordinate.
     pub fn max_x(&self) -> Short {
         self.right
     }
 
+    /// Minimum Y coordinate.
     pub fn min_y(&self) -> Short {
         self.top
     }
 
+    /// Maximum Y coordinate.
     pub fn max_y(&self) -> Short {
         self.bottom
     }
 }
 
+/// 2D point used by QuickDraw commands.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Point {
+    /// Horizontal coordinate.
     pub x: i16,
+    /// Vertical coordinate.
     pub y: i16,
 }
 
@@ -609,14 +635,18 @@ impl std::fmt::Display for Point {
     }
 }
 
+/// 8-byte monochrome pattern.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Pattern {
+    /// Pattern bit data.
     pub data: [u8; 8],
 }
 
-#[derive(BinRead, Debug, Clone, EnumIs)]
+/// Variant tag for pixel patterns.
+#[allow(missing_docs)]
+#[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PatternType {
@@ -629,6 +659,7 @@ pub enum PatternType {
     Unknown(u16),
 }
 
+/// Pixel pattern value used by color pattern opcodes.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -643,6 +674,7 @@ pub struct PixelPattern {
     dither_color: Option<RGBColor>,
 }
 
+/// Embedded pattern image payload for `PixelPattern`.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PatternImage {
@@ -692,6 +724,7 @@ impl BinRead for PatternImage {
     }
 }
 
+/// Pascal-style short string (`len` followed by bytes).
 #[binread]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -700,6 +733,7 @@ pub struct ShortString {
     string_len: u8,
     #[br(count = string_len)]
     #[br(map = |s: Vec<u8>| String::from_utf8_lossy(&s).to_string())]
+    /// Decoded UTF-8 lossy string payload.
     pub string: String,
 }
 
@@ -709,17 +743,21 @@ impl From<ShortString> for String {
     }
 }
 
+/// Arc angle in degrees used by arc opcodes.
 pub type Angle = u16;
 
+/// QuickDraw region, represented as a run-length encoded mask.
 #[binread]
 #[br(big)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Region {
-    //#[br(temp)]
+    /// Encoded region record size in bytes.
     pub size: u16,
+    /// Bounding box for the region, if present.
     #[br(if(size >= 2 + 8))]
     pub bounding_box: Option<Rect>,
+    /// Encoded row/column toggle data.
     #[br(count(size.saturating_sub(10) / 2))]
     pub data: Vec<i16>,
     #[br(ignore)]
@@ -733,6 +771,7 @@ impl Default for Region {
 }
 
 impl Region {
+    /// Creates an empty region.
     pub fn new() -> Self {
         Region {
             size: 0,
@@ -742,6 +781,7 @@ impl Region {
         }
     }
 
+    /// Prepares the decoded mask cache for point-in-region queries.
     pub fn prepare(&mut self) {
         if self.is_prepared() {
             return;
@@ -754,6 +794,7 @@ impl Region {
         self.decoded_mask.is_some() || self.data.is_empty()
     }
 
+    /// Returns `true` if the point is inside the prepared region mask.
     #[inline]
     pub fn contains(&self, x: i32, y: i32) -> bool {
         assert!(self.is_prepared(), "Mask has not bee prepared yet");
@@ -877,12 +918,15 @@ impl Region {
     }
 }
 
+/// Polygon payload used by poly drawing opcodes.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Polygon {
+    /// Size of the polygon record.
     pub size: u16,
     #[br(count(size - 2))]
+    /// Raw polygon point payload bytes.
     pub data: Vec<u8>,
 }
 
@@ -932,6 +976,7 @@ pub enum SourceMode {
     NotSrcBic = 7,
 }
 
+/// RGB color in QuickDraw 16-bit channel format.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -944,15 +989,19 @@ pub struct RGBColor {
     pub blue: u16,
 }
 
+/// Generic counted byte buffer.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Buffer {
+    /// Number of bytes in `data`.
     pub len: u16,
     #[br(count(len))]
+    /// Buffer payload bytes.
     pub data: Vec<u8>,
 }
 
+/// Color table entry.
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -963,6 +1012,7 @@ pub struct ColorSpec {
     pub rgb: RGBColor,
 }
 
+/// QuickDraw color table used for indexed pixmaps.
 #[binread]
 #[derive(Debug, Clone)]
 #[br(big)]
@@ -987,6 +1037,7 @@ impl Default for ColorTable {
 }
 
 impl ColorTable {
+    /// Creates an empty color table.
     pub fn new() -> Self {
         ColorTable {
             ct_seed: 0,
@@ -998,6 +1049,7 @@ impl ColorTable {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Parsed payload for CopyBits/PackBits style opcodes.
 pub enum CopyBits {
     /// Four opcodes ($0090, $0091, $0098, $0099) are modifications of version 1 opcodes. The first word
     /// following the opcode is rowBytes. If the high bit of rowBytes is set, then it is a pixel map
@@ -1005,21 +1057,36 @@ pub enum CopyBits {
     /// general, the difference between version 2 and version 1 formats is that the pixel map replaces
     /// the bitmap, a color table has been added, and pixData replaces bitData.
     Pixmap {
+        /// Source pixmap definition.
         pix_map: PixMap,
+        /// Source color table for indexed pixmaps.
         color_table: ColorTable,
+        /// Source rectangle.
         src_rect: Rect,
+        /// Destination rectangle.
         dst_rect: Rect,
+        /// Transfer mode.
         mode: TransferMode,
+        /// Optional mask region.
         mask_region: Option<Region>,
+        /// Pixel bytes.
         data: Vec<u8>,
     },
+    /// 1-bit bitmap copy payload.
     Bitmap {
+        /// Row-bytes including flags.
         bytes_per_row: u16,
+        /// Source bitmap bounds.
         bounds: Rect,
+        /// Transfer mode.
         mode: TransferMode,
+        /// Source rectangle.
         src_rect: Rect,
+        /// Destination rectangle.
         dst_rect: Rect,
+        /// Optional mask region.
         mask_region: Option<Region>,
+        /// Bitmap bytes.
         data: Vec<u8>,
     },
 }
@@ -1114,8 +1181,10 @@ impl BinRead for CopyBits {
     }
 }
 
+/// Pixel encoding category for a pixmap.
+#[allow(missing_docs)]
 #[binread]
-#[derive(Debug, Clone, EnumIs)]
+#[derive(Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PixelType {
@@ -1127,6 +1196,43 @@ pub enum PixelType {
     Unknown(i16),
 }
 
+impl TransferMode {
+    /// Returns `true` if this transfer mode is not recognized by the parser.
+    pub const fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown(_))
+    }
+}
+
+impl PatternType {
+    /// Returns `true` when this pattern uses an embedded color pattern image.
+    pub const fn is_normal(&self) -> bool {
+        matches!(self, Self::Normal)
+    }
+
+    /// Returns `true` when this pattern is represented by a dither color.
+    pub const fn is_dither(&self) -> bool {
+        matches!(self, Self::Dither)
+    }
+}
+
+impl PixelType {
+    /// Returns `true` when the pixmap uses indexed color entries.
+    pub const fn is_indexed(&self) -> bool {
+        matches!(self, Self::Indexed)
+    }
+
+    /// Returns `true` when the pixmap stores direct color values.
+    pub const fn is_direct_color(&self) -> bool {
+        matches!(self, Self::DirectColor)
+    }
+
+    /// Returns `true` when the value is not recognized.
+    pub const fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown(_))
+    }
+}
+
+/// QuickDraw pixmap header.
 #[binread]
 #[derive(Debug, Clone)]
 #[br(big, import(row_bytes_and_flags_low_byte: u8))]
@@ -1165,11 +1271,14 @@ pub struct PixMap {
 }
 
 impl PixMap {
+    /// Returns logical bytes per row, stripping high-bit flags.
     pub fn bytes_per_row(&self) -> u16 {
         self.row_bytes_and_flags & 0x7FFF
     }
 }
 
+/// Structured QuickDraw comment kind.
+#[allow(missing_docs)]
 #[derive(Debug, BinRead, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommentKind {

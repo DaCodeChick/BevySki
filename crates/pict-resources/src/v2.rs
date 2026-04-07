@@ -19,12 +19,18 @@ use super::shared::*;
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FixedRect {
+    /// Left coordinate in 16.16 fixed-point units.
     pub left: Fixed,
+    /// Top coordinate in 16.16 fixed-point units.
     pub top: Fixed,
+    /// Right coordinate in 16.16 fixed-point units.
     pub right: Fixed,
+    /// Bottom coordinate in 16.16 fixed-point units.
     pub bottom: Fixed,
 }
 
+/// Minor-version marker used by PICT v2 header records.
+#[allow(missing_docs)]
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -37,11 +43,13 @@ pub enum MinorVersion {
     Unknown(i32),
 }
 
+/// Extended PICT v2 header payload.
 #[binread]
 #[derive(Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Header {
+    /// Parsed minor version kind.
     pub version: MinorVersion,
     /// fixed-point bounding rectangle for picture
     pub bounds: FixedRect,
@@ -50,6 +58,8 @@ pub struct Header {
     pub reserved: u32,
 }
 
+/// Parsed PICT v2 opcode stream item.
+#[allow(missing_docs)]
 #[derive(BinRead, Debug, Clone)]
 #[br(big)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -599,14 +609,21 @@ pub enum Opcode {
     Unknown(u16),
 }
 
+/// DirectBits payload used by direct-color bitmap copy opcodes.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DirectBits {
+    /// Source pixmap descriptor.
     pub pix_map: PixMap,
+    /// Source rectangle.
     pub src_rect: Rect,
+    /// Destination rectangle.
     pub dst_rect: Rect,
+    /// Transfer mode.
     pub mode: TransferMode,
+    /// Optional clipping mask.
     pub mask: Option<Region>,
+    /// Pixel bytes.
     pub data: Vec<u8>,
 }
 

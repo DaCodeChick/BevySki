@@ -899,6 +899,7 @@ impl DrawingContext {
         false
     }
 
+    /// Returns a shared reference to the current canvas image.
     pub fn image(&self) -> &image::ImageBuffer<image::Rgba<u8>, Vec<u8>> {
         &self.canvas
     }
@@ -1055,6 +1056,9 @@ impl DrawingContext {
     }
 }
 
+/// Decodes a 1-bit bitmap into an RGBA image.
+///
+/// Bits are expanded to grayscale pixels (`0x00`/`0xFF`) with opaque alpha.
 pub fn decode_bitmap(
     bounds: &Rect,
     bytes_per_row: usize,
@@ -1083,6 +1087,9 @@ pub fn decode_bitmap(
     image
 }
 
+/// Decodes a pixmap payload and color table into an RGBA image.
+///
+/// Supports indexed and direct-color pixmaps used by QuickDraw PICT data.
 pub fn decode_pixmap(
     pix_map: &PixMap,
     color_table: &ColorTable,
