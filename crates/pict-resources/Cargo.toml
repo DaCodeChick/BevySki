@@ -12,12 +12,12 @@ serde = ["dep:serde", "dep:serde-big-array"]
 
 [dependencies]
 binrw.workspace = true
-enum_is = "0.2"
+enum_is = "0.2.1"
 fourcc-rs.workspace = true
-image = "0.25"
+image = "0.25.10"
 itertools = "0.14"
-log = "0.4"
+log = "0.4.29"
 resource-fork-rs.workspace = true
 serde = { workspace = true, features = ["derive"], optional = true }
-serde-big-array = { version = "0.5", optional = true }
+serde-big-array = { version = "0.5.1", optional = true }
 thiserror.workspace = true
