@@ -1,6 +1,7 @@
 //! Global game resources.
 
 use bevy::prelude::*;
+use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 
 /// A ski course with obstacles and difficulty settings.
@@ -74,20 +75,66 @@ impl Course {
 /// Game configuration settings.
 #[derive(Resource)]
 pub struct GameSettings {
-    /// Whether sound effects are enabled.
-    pub sound_enabled: bool,
-    /// Whether animations are enabled.
-    pub animation_enabled: bool,
-    /// Whether ski trails should be shown.
-    pub show_trails: bool,
+    /// Enabled runtime options stored as bit flags.
+    pub flags: GameSettingFlags,
+    /// Current logical window size in pixels.
+    pub window_size: Vec2,
+    /// Current game scale derived from window size.
+    pub game_scale: f32,
+}
+
+bitflags! {
+    /// Compact bit flags for runtime game options.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct GameSettingFlags: u32 {
+        /// Sound effects and music are enabled.
+        const SOUND = 1 << 0;
+        /// Gameplay and visual animations are enabled.
+        const ANIMATION = 1 << 1;
+        /// Ski trails are rendered.
+        const TRAILS = 1 << 2;
+    }
+}
+
+impl GameSettings {
+    /// Returns true when a specific setting is enabled.
+    pub fn is_enabled(&self, flag: GameSettingFlags) -> bool {
+        self.flags.contains(flag)
+    }
+
+    /// Enables or disables a specific setting.
+    pub fn set_enabled(&mut self, flag: GameSettingFlags, enabled: bool) {
+        if enabled {
+            self.flags.insert(flag);
+            return;
+        }
+
+        self.flags.remove(flag);
+    }
+
+    /// Toggles a specific setting flag.
+    pub fn toggle(&mut self, flag: GameSettingFlags) {
+        self.flags.toggle(flag);
+    }
+
+    /// Updates window metrics and derived scale.
+    pub fn update_window_metrics(&mut self, width: f32, height: f32) {
+        self.window_size = Vec2::new(width, height);
+        let width_scale = width / crate::constants::VIEWPORT_WIDTH;
+        let height_scale = height / crate::constants::VIEWPORT_HEIGHT;
+        self.game_scale = width_scale.min(height_scale).max(0.1);
+    }
 }
 
 impl Default for GameSettings {
     fn default() -> Self {
         Self {
-            sound_enabled: true,
-            animation_enabled: true,
-            show_trails: true,
+            flags: GameSettingFlags::SOUND | GameSettingFlags::ANIMATION | GameSettingFlags::TRAILS,
+            window_size: Vec2::new(
+                crate::constants::VIEWPORT_WIDTH,
+                crate::constants::VIEWPORT_HEIGHT,
+            ),
+            game_scale: 1.0,
         }
     }
 }

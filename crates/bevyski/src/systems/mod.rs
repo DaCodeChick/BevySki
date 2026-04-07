@@ -4,7 +4,9 @@ pub mod collision;
 pub mod course;
 pub mod movement;
 pub mod rendering;
+pub mod settings_ui;
 
+use crate::states::GameState;
 use bevy::prelude::*;
 
 /// Plugin that registers all core gameplay systems.
@@ -12,6 +14,15 @@ pub struct GameSystemsPlugin;
 
 impl Plugin for GameSystemsPlugin {
     fn build(&self, app: &mut App) {
+        app.init_resource::<settings_ui::SettingsDialogState>();
+        app.add_systems(
+            Startup,
+            (
+                settings_ui::setup_settings_dialog,
+                settings_ui::initialize_window_metrics,
+            ),
+        );
+
         app.add_systems(
             Update,
             (
@@ -22,7 +33,18 @@ impl Plugin for GameSystemsPlugin {
                 rendering::render_obstacles,
                 rendering::camera_follow_skier,
             )
-                .chain(),
+                .chain()
+                .run_if(in_state(GameState::Playing)),
+        );
+
+        app.add_systems(
+            Update,
+            (
+                settings_ui::toggle_settings_dialog,
+                settings_ui::handle_settings_button_interaction,
+                settings_ui::sync_settings_dialog,
+                settings_ui::update_window_metrics_from_resize,
+            ),
         );
     }
 }

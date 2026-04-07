@@ -220,7 +220,7 @@ MacSki used QuickDraw, Apple's 2D graphics API:
 
 ## Original Assets
 
-The original MacSki v1.7 resource files are available in `/home/admin/Downloads/MacSki/`:
+At runtime, if extracted assets are missing, the game prompts for the folder containing original MacSki `.rsrc` files:
 - `MacSki Color Art.rsrc` - Sprite graphics (298KB)
 - `MacSki Sounds.rsrc` - Sound effects (233KB)
 - `MacSki v1.7.rsrc` - Main game resources (419KB)

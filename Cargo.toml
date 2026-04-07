@@ -1,8 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/bevyski",
-    "crates/resfork",
+    "crates/bevyski", "crates/pict-resources",
 ]
 
 [workspace.package]
@@ -15,14 +14,19 @@ license = "GPL-3.0"
 bevy = "0.18"
 
 # Utilities
+binrw = "0.15"
+bitflags = "2.10"
 byteorder = "1.5"
+fourcc-rs = "0.2"
+hound = "3.5"
+resource-fork-rs = "0.2"
 rand = "0.8"
+rfd = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+snd-resources = "0.1.2"
 thiserror = "2.0"
-
-# Internal crates
-resfork = { path = "crates/resfork" }
+pict-resources = { path = "crates/pict-resources" }
 
 [profile.dev]
 opt-level = 1

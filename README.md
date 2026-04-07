@@ -121,13 +121,13 @@ BevySki/
 │   │   │   ├── constants.rs      # Game constants from original
 │   │   │   └── states.rs         # Game state machine
 │   │   └── Cargo.toml
-│   └── resfork/           # Resource fork parser library
+│   └── pict-resources/      # PICT decoder and PNG converter
 │       ├── src/
-│       │   ├── lib.rs            # Core parser
-│       │   └── types.rs          # MacSki resource types
-│       ├── examples/
-│       │   └── list_resources.rs # Example usage
-│       ├── README.md
+│       │   ├── lib.rs            # Public conversion APIs
+│       │   ├── drawing_context.rs
+│       │   ├── shared.rs
+│       │   ├── v1.rs
+│       │   └── v2.rs
 │       └── Cargo.toml
 ├── courses/               # Course data files
 ├── README.md
@@ -146,16 +146,20 @@ cargo build --release
 
 # Run the game
 cargo run -p bevyski
-
-# Run resource fork examples
-cargo run -p resfork --example list_resources
 ```
 
 ### Technology Stack
 
 - **Rust Edition**: 2024
 - **Game Engine**: Bevy 0.18
-- **Resource Parser**: Custom resfork crate for classic Mac resource files
+- **Resource Parser**: `resource-fork-rs` + `snd-resources` + `pict-resources`
+
+### Asset Extraction
+
+- On startup, the game checks `assets/extracted` for converted assets.
+- If missing, it prompts the user to browse for the folder containing original `.rsrc` files.
+- Sound resources are converted to `.wav`.
+- PICT resources are extracted as `.pict` and converted to `.png`.
 
 ### Contributing
 Contributions are welcome! This project aims to be a faithful recreation while modernizing for cross-platform play.
@@ -165,6 +169,7 @@ Contributions are welcome! This project aims to be a faithful recreation while m
 - **Original MacSki**: David Rowbotham (mid-1990s)
 - **BevySki**: Reverse engineered and reimplemented by the open-source community
 - **Engine**: Built with [Bevy](https://bevyengine.org/) game engine
+- **PICT decoding base**: Adapted from `pict` (pict-rs) by cyco, Apache-2.0
 
 ## License
 

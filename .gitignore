@@ -25,3 +25,6 @@ target
 
 /target
 Cargo.lock
+
+# Generated runtime assets
+assets/extracted/

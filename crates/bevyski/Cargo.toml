@@ -8,7 +8,14 @@ license.workspace = true
 
 [dependencies]
 bevy.workspace = true
+binrw.workspace = true
+bitflags.workspace = true
+fourcc-rs.workspace = true
+hound.workspace = true
 rand.workspace = true
+rfd.workspace = true
+resource-fork-rs.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-resfork.workspace = true
+snd-resources.workspace = true
+pict-resources.workspace = true
